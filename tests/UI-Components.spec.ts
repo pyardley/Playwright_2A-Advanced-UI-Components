@@ -72,6 +72,28 @@ test(
 );
 
 test(
+  "Physical Click",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, physicalClickPage, browserName }) => {
+    // The site's click handler only accepts the click if event.screenX > 0.
+    // Confirmed via a standalone script that Playwright's WebKit driver never
+    // populates MouseEvent.screenX for automated input (locator.click(),
+    // headed, and raw page.mouse.down()/up() all report screenX 0), so this
+    // is unwinnable in WebKit regardless of click method. Re-enable once
+    // Playwright's WebKit driver reports real screen coordinates.
+    test.skip(
+      browserName === "webkit",
+      "WebKit never reports MouseEvent.screenX for automated clicks",
+    );
+
+    await physicalClickPage.goto();
+    await expect(page).toHaveURL("/click");
+    const wasClicked = await physicalClickPage.clickPysicalButton();
+    expect(wasClicked).toBe(true);
+  },
+);
+
+test(
   "Text Input",
   { tag: ["@smoke", "@e2e"] },
   async ({ page, textInputPage }) => {
@@ -127,5 +149,123 @@ test(
     await progressBarPage.waitForProgressBarToReachValue(75);
     const progressBarValue = await progressBarPage.getProgressBarValue();
     expect(Math.abs(progressBarValue - 75)).toBeLessThanOrEqual(1); // Allow for a small margin of error
+  },
+);
+
+test(
+  "Visibility",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, visibilityPage }) => {
+    await visibilityPage.goto();
+    await expect(page).toHaveURL("/visibility");
+
+    const removedButton = await visibilityPage.getRemovedButton();
+    const zeroWidthButton = await visibilityPage.getZeroWidthButton();
+    const overlappedButton = await visibilityPage.getOverlappedButton();
+    const transparentButton = await visibilityPage.getTransparentButton();
+    const visibilityHiddenButton =
+      await visibilityPage.getVisibilityHiddenButton();
+    const notDisplayedButton = await visibilityPage.getNotDisplayedButton();
+    const offscreenButton = await visibilityPage.getOffscreenButton();
+
+    expect(await visibilityPage.isActuallyVisible(removedButton)).toBe(true);
+    expect(await visibilityPage.isActuallyVisible(zeroWidthButton)).toBe(true);
+    expect(await visibilityPage.isActuallyVisible(overlappedButton)).toBe(true);
+    expect(await visibilityPage.isActuallyVisible(transparentButton)).toBe(
+      true,
+    );
+    expect(await visibilityPage.isActuallyVisible(visibilityHiddenButton)).toBe(
+      true,
+    );
+    expect(await visibilityPage.isActuallyVisible(notDisplayedButton)).toBe(
+      true,
+    );
+    expect(await visibilityPage.isActuallyVisible(offscreenButton)).toBe(true);
+
+    await visibilityPage.clickHideButton();
+
+    expect(await visibilityPage.isActuallyVisible(removedButton)).toBe(false);
+    expect(await visibilityPage.isActuallyVisible(zeroWidthButton)).toBe(false);
+    expect(await visibilityPage.isActuallyVisible(overlappedButton)).toBe(
+      false,
+    );
+    expect(await visibilityPage.isActuallyVisible(transparentButton)).toBe(
+      false,
+    );
+    expect(await visibilityPage.isActuallyVisible(visibilityHiddenButton)).toBe(
+      false,
+    );
+    expect(await visibilityPage.isActuallyVisible(notDisplayedButton)).toBe(
+      false,
+    );
+    expect(await visibilityPage.isActuallyVisible(offscreenButton)).toBe(false);
+  },
+);
+
+test(
+  "Sample App - Successful Login",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, sampleAppPage }) => {
+    await sampleAppPage.goto();
+    await expect(page).toHaveURL("/sampleapp");
+    await sampleAppPage.setUserName("testuser");
+    await sampleAppPage.setPassword("pwd");
+    await sampleAppPage.clickLogInButton();
+    const loginMessage = (
+      await (await sampleAppPage.getLoginMessage()).innerText()
+    ).trim();
+    expect(loginMessage).toBe("Welcome, testuser!");
+  },
+);
+
+test(
+  "Sample App - Failed Login",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, sampleAppPage }) => {
+    await sampleAppPage.goto();
+    await expect(page).toHaveURL("/sampleapp");
+    await sampleAppPage.setUserName("wronguser");
+    await sampleAppPage.setPassword("wrongpwd");
+    await sampleAppPage.clickLogInButton();
+    const loginErrorMessage = (
+      await (await sampleAppPage.getLoginErrorMessage()).innerText()
+    ).trim();
+    expect(loginErrorMessage).toBe("Invalid username/password");
+  },
+);
+
+test(
+  "Mouse Over - Click me",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, mouseOverPage }) => {
+    await mouseOverPage.goto();
+    await expect(page).toHaveURL("/mouseover");
+    await mouseOverPage.clickClickMeLink();
+    await mouseOverPage.clickClickMeLink();
+    const clickMeClicks = await mouseOverPage.getClickMeClicks();
+    expect(clickMeClicks).toBe("2");
+  },
+);
+
+test(
+  "Mouse Over - Link Button",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, mouseOverPage }) => {
+    await mouseOverPage.goto();
+    await expect(page).toHaveURL("/mouseover");
+    await mouseOverPage.clickLinkButton();
+    await mouseOverPage.clickLinkButton();
+    const clickButtonClicks = await mouseOverPage.getClickButtonClicks();
+    expect(clickButtonClicks).toBe("2");
+  },
+);
+
+test(
+  "Non-Breaking Space",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, nonBreakingSpacePage }) => {
+    await nonBreakingSpacePage.goto();
+    await expect(page).toHaveURL("/nbsp");
+    await nonBreakingSpacePage.clickOnButton();
   },
 );
