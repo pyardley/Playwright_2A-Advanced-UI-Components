@@ -16,6 +16,8 @@ import { SampleAppPage } from "@pages/SampleAppPage";
 import { MouseOverPage } from "@pages/MouseOverPage";
 import { NonBreakingSpacePage } from "@pages/NonBreakingSpacePage";
 import { OverlappedElementPage } from "@pages/OverlappedElementPage";
+import { ShadowDOMPage } from "@pages/ShadowDOMPage";
+import { AlertsPage } from "@pages/AlertsPage";
 
 // Pattern for blocking ad domains in smoke runs (where real-site ads can
 // inject markup that breaks locators). Expand AD_DOMAIN_PATTERN to match
@@ -43,6 +45,8 @@ type Fixtures = {
   mouseOverPage: MouseOverPage;
   nonBreakingSpacePage: NonBreakingSpacePage;
   overlappedElementPage: OverlappedElementPage;
+  shadowDOMPage: ShadowDOMPage;
+  alertsPage: AlertsPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -76,6 +80,8 @@ export const test = base.extend<Fixtures>({
     use(new NonBreakingSpacePage(page)),
   overlappedElementPage: async ({ page }, use) =>
     use(new OverlappedElementPage(page)),
+  shadowDOMPage: async ({ page }, use) => use(new ShadowDOMPage(page)),
+  alertsPage: async ({ page }, use) => use(new AlertsPage(page)),
 });
 
 export { expect };

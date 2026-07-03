@@ -269,3 +269,122 @@ test(
     await nonBreakingSpacePage.clickOnButton();
   },
 );
+
+test(
+  "Overlapped Element",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, overlappedElementPage }) => {
+    await overlappedElementPage.goto();
+    await expect(page).toHaveURL("/overlapped");
+    await overlappedElementPage.setId("test-id");
+    await overlappedElementPage.setName("test-name");
+  },
+);
+
+test.describe("Shadow DOM", () => {
+  // Only this test needs an HTTPS origin (for navigator.clipboard) and the
+  // site's HTTPS mirror has an untrusted cert - scoped here so the rest of
+  // the suite keeps using the plain-HTTP baseURL.
+  test.use({ ignoreHTTPSErrors: true });
+
+  test(
+    "Shadow DOM",
+    { tag: ["@smoke", "@e2e"] },
+    async ({ page, shadowDOMPage, context, browserName }) => {
+      // context.grantPermissions(['clipboard-read', 'clipboard-write']) is
+      // Chromium-only in Playwright - Firefox and WebKit both reject those
+      // permission names with "Unknown permission". Re-enable once
+      // Playwright supports clipboard permissions on those browsers.
+      test.skip(
+        browserName !== "chromium",
+        "Clipboard permissions are only supported on Chromium in Playwright",
+      );
+
+      await shadowDOMPage.goto();
+      await expect(page).toHaveURL("https://uitestingplayground.com/shadowdom");
+      await shadowDOMPage.clickGenerateGUID();
+      await shadowDOMPage.clickCopyGUID(context);
+      const clipboardValue = await shadowDOMPage.getClipboardValue();
+      const generatedGUID = await shadowDOMPage.getGeneratedGUID();
+      expect(generatedGUID).toBe(clipboardValue);
+    },
+  );
+});
+
+test(
+  "Alert",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, alertsPage }) => {
+    await alertsPage.goto();
+    await expect(page).toHaveURL("/alerts");
+
+    const dialogs: { type: string; message: string }[] = [];
+    page.on("dialog", async (dialog) => {
+      dialogs.push({ type: dialog.type(), message: dialog.message() });
+      await dialog.accept();
+    });
+
+    await alertsPage.clickAlertButton();
+    await expect.poll(() => dialogs.length).toBe(1);
+
+    expect(dialogs[0]).toEqual({
+      type: "alert",
+      message: "Today is a working day.\nOr less likely a holiday.",
+    });
+  },
+);
+
+test(
+  "Confirm",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, alertsPage }) => {
+    await alertsPage.goto();
+    await expect(page).toHaveURL("/alerts");
+
+    // Confirm triggers a second, delayed alert reporting the result, so the
+    // listener must stay registered (not just page.once) to catch both.
+    const dialogs: { type: string; message: string }[] = [];
+    page.on("dialog", async (dialog) => {
+      dialogs.push({ type: dialog.type(), message: dialog.message() });
+      await dialog.accept();
+    });
+
+    await alertsPage.clickConfirmButton();
+    await expect.poll(() => dialogs.length).toBe(2);
+
+    expect(dialogs[0]).toEqual({
+      type: "confirm",
+      message: "Today is Friday.\nDo you agree?",
+    });
+    expect(dialogs[1]).toEqual({ type: "alert", message: "Yes" });
+  },
+);
+
+test(
+  "Prompt",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, alertsPage }) => {
+    await alertsPage.goto();
+    await expect(page).toHaveURL("/alerts");
+
+    // Prompt also triggers a delayed follow-up alert with the entered value.
+    const dialogs: { type: string; message: string }[] = [];
+    page.on("dialog", async (dialog) => {
+      dialogs.push({ type: dialog.type(), message: dialog.message() });
+      if (dialog.type() === "prompt") {
+        await dialog.accept("dogs");
+      } else {
+        await dialog.accept();
+      }
+    });
+
+    await alertsPage.clickPromptButton();
+    await expect.poll(() => dialogs.length).toBe(2);
+
+    expect(dialogs[0]).toEqual({
+      type: "prompt",
+      message: 'Choose "cats" or \'dogs\'.\nEnter your value:',
+    });
+    expect(dialogs[1]).toEqual({ type: "alert", message: "User value: dogs" });
+  },
+);
