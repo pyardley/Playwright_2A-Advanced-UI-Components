@@ -580,3 +580,173 @@ test(
     expect(valueChangedMessage).toBe("Value changed to: " + newValue);
   },
 );
+
+// Scenario: http://uitestingplayground.com/autowait
+// Choose an element type from the combobox.
+// Check the checkboxes to set the element's properties.
+// Then click one of the Apply buttons to immediately apply the settings and restore interactable state of the element after a delay.
+// Interact with the element in the Playground section (click, select item, enter text).
+// Observe the status messages.
+test(
+  "Auto Wait - Button / Visible / 3s wait",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, autoWaitPage }) => {
+    await autoWaitPage.goto();
+    await expect(page).toHaveURL("/autowait");
+
+    // Set the element type, checkbox and click Apply button to apply the settings
+    await autoWaitPage.setElementTypeSelector("button");
+    await autoWaitPage.unsetVisibleCheckbox();
+    await autoWaitPage.clickApply3sButton();
+
+    // Check that the changes have been applied and the target element is hidden
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element settings applied for 3 seconds.",
+    );
+    await expect(await autoWaitPage.getTargetControl()).toBeHidden();
+
+    // Check that the changes are reverted after the expected time has expired and the target element is visible again
+    await expect(await autoWaitPage.getTargetControl()).toBeVisible({
+      timeout: 4000,
+    });
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element state restored.",
+    );
+
+    // Click the control
+    await autoWaitPage.clickTargetButton();
+    expect(await autoWaitPage.getStatusMessage()).toBe("Target clicked.");
+  },
+);
+
+test(
+  "Auto Wait - Input / Enabled / 5s wait",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, autoWaitPage }) => {
+    await autoWaitPage.goto();
+    await expect(page).toHaveURL("/autowait");
+
+    // Set the element type, checkbox and click Apply button to apply the settings
+    await autoWaitPage.setElementTypeSelector("input");
+    await autoWaitPage.unsetEnabledCheckbox();
+    await autoWaitPage.clickApply5sButton();
+
+    // Check that the changes have been applied and the target element is hidden
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element settings applied for 5 seconds.",
+    );
+    await expect(await autoWaitPage.getTargetControl()).toBeDisabled();
+
+    // Check that the changes are reverted after the expected time has expired and the target element is visible again
+    await expect(await autoWaitPage.getTargetControl()).toBeEnabled({
+      timeout: 6000,
+    });
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element state restored.",
+    );
+
+    // Click the control
+    await autoWaitPage.setInputText("test");
+
+    expect(await autoWaitPage.getStatusMessage()).toBe("Text: test");
+  },
+);
+
+test(
+  "Auto Wait - TextArea / Editable / 10s wait",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, autoWaitPage }) => {
+    await autoWaitPage.goto();
+    await expect(page).toHaveURL("/autowait");
+
+    // Set the element type, checkbox and click Apply button to apply the settings
+    await autoWaitPage.setElementTypeSelector("Textarea");
+    await autoWaitPage.unsetEditableCheckbox();
+    await autoWaitPage.clickApply10sButton();
+
+    // Check that the changes have been applied and the target element is hidden
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element settings applied for 10 seconds.",
+    );
+    await expect(await autoWaitPage.getTargetControl()).not.toBeEditable();
+
+    // Check that the changes are reverted after the expected time has expired and the target element is visible again
+    await expect(await autoWaitPage.getTargetControl()).toBeEditable({
+      timeout: 11000,
+    });
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element state restored.",
+    );
+
+    // Click the control
+    await autoWaitPage.setInputTextArea("test");
+
+    expect(await autoWaitPage.getStatusMessage()).toBe("Text: test");
+  },
+);
+
+test(
+  "Auto Wait - Select / On Top / 3s wait",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, autoWaitPage }) => {
+    await autoWaitPage.goto();
+    await expect(page).toHaveURL("/autowait");
+
+    // Set the element type, checkbox and click Apply button to apply the settings
+    await autoWaitPage.setElementTypeSelector("Select");
+    await autoWaitPage.unsetOnTopCheckbox();
+    await autoWaitPage.clickApply3sButton();
+
+    // Check that the changes have been applied and the target element is covered by the overlay
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element settings applied for 3 seconds.",
+    );
+    await expect(await autoWaitPage.getTargetControl()).toBeVisible();
+    expect(await autoWaitPage.isTargetOnTop()).toBe(false);
+
+    // Check that the changes are reverted after the expected time has expired and the target element is on top again
+    await expect
+      .poll(() => autoWaitPage.isTargetOnTop(), { timeout: 4000 })
+      .toBe(true);
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element state restored.",
+    );
+
+    // Click the control
+    await autoWaitPage.setTargetSelector("Item 2");
+
+    expect(await autoWaitPage.getStatusMessage()).toBe("Selected: Item 2");
+  },
+);
+
+test(
+  "Auto Wait - Label / Non Zero Size / 3s wait",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, autoWaitPage }) => {
+    await autoWaitPage.goto();
+    await expect(page).toHaveURL("/autowait");
+
+    // Set the element type, checkbox and click Apply button to apply the settings
+    await autoWaitPage.setElementTypeSelector("Label");
+    await autoWaitPage.unsetNonZeroSizeCheckbox();
+    await autoWaitPage.clickApply3sButton();
+
+    // Check that the changes have been applied and the target element is hidden
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element settings applied for 3 seconds.",
+    );
+    await expect(await autoWaitPage.getTargetControl()).toBeHidden();
+
+    // Check that the changes are reverted after the expected time has expired and the target element is visible again
+    await expect(await autoWaitPage.getTargetControl()).toBeVisible({
+      timeout: 4000,
+    });
+    expect(await autoWaitPage.getStatusMessage()).toBe(
+      "Target element state restored.",
+    );
+
+    // Click the control
+    await autoWaitPage.clickTargetLabel();
+    expect(await autoWaitPage.getStatusMessage()).toBe("Target clicked.");
+  },
+);
