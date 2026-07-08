@@ -25,6 +25,9 @@ import { AutoWaitPage } from "@pages/AutoWaitPage";
 import { FramesPage } from "@pages/FramesPage";
 import { GeolocationPage } from "@pages/GeolocationPage";
 import { ClearInputPage } from "@pages/ClearInputPage";
+import { ScrollToClickPage } from "@pages/ScrollToClickPage";
+import { CssSelectorsPage } from "@pages/CssSelectorsPage";
+import { SelectPage } from "@pages/SelectPage";
 
 // Pattern for blocking ad domains in smoke runs (where real-site ads can
 // inject markup that breaks locators). Expand AD_DOMAIN_PATTERN to match
@@ -61,6 +64,9 @@ type Fixtures = {
   framesPage: FramesPage;
   geolocationPage: GeolocationPage;
   clearInputPage: ClearInputPage;
+  scrollToClickPage: ScrollToClickPage;
+  cssSelectorsPage: CssSelectorsPage;
+  selectPage: SelectPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -104,6 +110,9 @@ export const test = base.extend<Fixtures>({
   framesPage: async ({ page }, use) => use(new FramesPage(page)),
   geolocationPage: async ({ page }, use) => use(new GeolocationPage(page)),
   clearInputPage: async ({ page }, use) => use(new ClearInputPage(page)),
+  scrollToClickPage: async ({ page }, use) => use(new ScrollToClickPage(page)),
+  cssSelectorsPage: async ({ page }, use) => use(new CssSelectorsPage(page)),
+  selectPage: async ({ page }, use) => use(new SelectPage(page)),
 });
 
 export { expect };

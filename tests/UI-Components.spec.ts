@@ -1,5 +1,4 @@
 import { test, expect } from "@fixtures/fixtures";
-import { clear } from "console";
 import * as path from "path";
 
 const SAMPLE_UPLOAD_FILE = path.join(
@@ -869,3 +868,118 @@ test(
     expect(message).toBe("All fields are cleared!");
   },
 );
+
+// Scenario: http://uitestingplayground.com/scrolltoclick
+// Find each target button and click it.
+// Some buttons require scrolling the page, some require scrolling a container, and some require scrolling a parent first.
+// One button only appears when you hover over its parent element.
+// After clicking a button it turns green and shows "Clicked!".
+// Click all four buttons to complete the challenge.
+
+test(
+  "Scroll to click",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, scrollToClickPage }) => {
+    await scrollToClickPage.goto();
+    await expect(page).toHaveURL("/scrolltoclick");
+
+    await scrollToClickPage.clickButton1();
+    await scrollToClickPage.clickButton2();
+    await scrollToClickPage.clickButton3();
+
+    expect(
+      await scrollToClickPage.hoverAndClickRow("Meeting notes - Q4 planning"),
+    ).toBeFalsy();
+    expect(
+      await scrollToClickPage.hoverAndClickRow("Re: Project deadline update"),
+    ).toBeFalsy();
+    expect(
+      await scrollToClickPage.hoverAndClickRow("Weekly status report"),
+    ).toBeTruthy();
+    expect(
+      await scrollToClickPage.hoverAndClickRow("Invitation: Team lunch Friday"),
+    ).toBeFalsy();
+
+    expect(await scrollToClickPage.getMessageText()).toBe(
+      "All buttons clicked!",
+    );
+  },
+);
+
+// Scenario: http://uitestingplayground.com/cssselectors
+// Practice locating elements using ID, class, attribute, and combinatory CSS selectors.
+// Pierce through multiple levels of Shadow DOM to reach deeply nested elements.
+// Use :visible and :hidden pseudo-classes to filter elements by visibility state.
+test(
+  "CSS Selectors",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, cssSelectorsPage }) => {
+    await cssSelectorsPage.goto();
+    await expect(page).toHaveURL("/cssselectors");
+
+    await cssSelectorsPage.clickPrimaryButton();
+    await cssSelectorsPage.clickFirstButton();
+    await cssSelectorsPage.clickSecondButton();
+    await cssSelectorsPage.clickThirdButton();
+
+    await cssSelectorsPage.setUsername("Test");
+    await cssSelectorsPage.setEmail("test@test.com");
+    await cssSelectorsPage.clickExternalLink();
+    await cssSelectorsPage.clickActiveBadge();
+    await cssSelectorsPage.clickInactiveBadge();
+
+    await cssSelectorsPage.clickListItem1();
+    await cssSelectorsPage.clickListItem2();
+    await cssSelectorsPage.clickListItem3();
+    await cssSelectorsPage.clickFirstPara();
+    await cssSelectorsPage.clickSecondPara();
+    await cssSelectorsPage.clickSpan();
+
+    await cssSelectorsPage.clickCell(2, 2);
+
+    await cssSelectorsPage.clickIAmVisibleButton();
+
+    await cssSelectorsPage.clickLevel1Button();
+    await cssSelectorsPage.setLevel1Input("Level 1");
+    await cssSelectorsPage.clickLevel2Button();
+    await cssSelectorsPage.setLevel2Input("Level 2");
+    await cssSelectorsPage.clickLevel3Button();
+    await cssSelectorsPage.setLevel3Input("Level 3");
+  },
+);
+
+// Scenario: http://uitestingplayground.com/select
+// Select specific options from single-select dropdowns using option text and option value.
+// Add and remove selections in multi-select controls.
+// Verify current selection using the status labels.
+// Handle options containing non-breaking spaces.
+// Use regex-based selection for pattern matching.
+test("Select", { tag: ["@smoke", "@e2e"] }, async ({ page, selectPage }) => {
+  await selectPage.goto();
+  await expect(page).toHaveURL("/select");
+
+  await selectPage.selectProgrammingLanguage("py");
+  expect(await selectPage.getProgrammingLanguageMessage()).toBe(
+    "Selected: Python (value: py)",
+  );
+
+  await selectPage.selectCity("lv");
+  // The option text uses a non-breaking space between "Las" and "Vegas"
+  // (this page's whole point is exercising nbsp-containing option text).
+  expect(await selectPage.getCityMessage()).toBe(
+    "Selected: Las Vegas (value: lv)",
+  );
+
+  await selectPage.selectVersion("v2.1");
+  expect(await selectPage.getVersionMessage()).toBe(
+    "Selected: Release 2.1 (value: v2.1)",
+  );
+
+  await selectPage.selectColors(["green", "purple"]);
+  expect(await selectPage.getColorsMessage()).toBe("Selected: Green, Purple");
+
+  await selectPage.selectFruits(["banana", "cherry"]);
+  expect(await selectPage.getFruitsMessage()).toBe(
+    "Selected: Apple, Banana, Cherry, Grape",
+  );
+});
