@@ -1,4 +1,5 @@
 import { test, expect } from "@fixtures/fixtures";
+import { clear } from "console";
 import * as path from "path";
 
 const SAMPLE_UPLOAD_FILE = path.join(
@@ -748,5 +749,123 @@ test(
     // Click the control
     await autoWaitPage.clickTargetLabel();
     expect(await autoWaitPage.getStatusMessage()).toBe("Target clicked.");
+  },
+);
+
+// Scenario: http://uitestingplayground.com/frames
+// Switch to the outer frame (level 1).
+// Find and click each button using different locator strategies.
+// Switch to the inner frame (level 2) nested inside the outer frame.
+// Find and click the same buttons (identical markup) in the inner frame.
+test(
+  "Frames - Outer Edit Button",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, framesPage }) => {
+    await framesPage.goto();
+    await expect(page).toHaveURL("/frames");
+
+    // Interact with buttons in the outer frame
+    await framesPage.clickOuterEditButton();
+    expect(await framesPage.getOuterMessage()).toBe("Button pressed: Edit");
+  },
+);
+
+test(
+  "Frames - Inner Submit Button",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, framesPage }) => {
+    await framesPage.goto();
+    await expect(page).toHaveURL("/frames");
+
+    // Interact with buttons in the outer frame
+    await framesPage.clickInnerSubmitButton();
+    expect(await framesPage.getInnerMessage()).toBe("Button pressed: Submit");
+  },
+);
+
+// Scenario (http://uitestingplayground.com/geolocation):
+// - Click the button to trigger a geolocation request.
+// - Handle the browser permission prompt (Allow or Deny).
+// - Verify that the label displays coordinates or "unavailable" based on
+//   the user's choice.
+//
+// The Geolocation API is blocked outright on the plain-HTTP origin (no
+// secure context), so these tests use the site's HTTPS mirror (untrusted
+// cert, hence ignoreHTTPSErrors). Playwright-controlled browsers never show
+// a real permission prompt either way - permission state is driven directly
+// via context.grantPermissions()/clearPermissions().
+test.describe("Geolocation", () => {
+  test.use({ ignoreHTTPSErrors: true });
+
+  test(
+    "Geolocation - Allow",
+    { tag: ["@smoke", "@e2e"] },
+    async ({ page, context, geolocationPage }) => {
+      await context.setGeolocation({ latitude: 51.5, longitude: -0.12 });
+      await geolocationPage.allowLocation(context);
+
+      await geolocationPage.goto();
+      await expect(page).toHaveURL(
+        "https://uitestingplayground.com/geolocation",
+      );
+
+      await geolocationPage.clickRequestLocationButton();
+      await expect
+        .poll(() => geolocationPage.getLocationMessage())
+        .toBe("51.500000, -0.120000");
+    },
+  );
+
+  test(
+    "Geolocation - Deny",
+    { tag: ["@smoke", "@e2e"] },
+    async ({ page, context, geolocationPage, browserName }) => {
+      // Firefox leaves an unresolved (default) permission request hanging
+      // indefinitely instead of auto-denying, unlike Chromium and WebKit.
+      test.skip(
+        browserName === "firefox",
+        "Firefox never resolves an unhandled geolocation permission request",
+      );
+
+      await geolocationPage.denyLocation(context);
+
+      await geolocationPage.goto();
+      await expect(page).toHaveURL(
+        "https://uitestingplayground.com/geolocation",
+      );
+
+      await geolocationPage.clickRequestLocationButton();
+      await expect
+        .poll(() => geolocationPage.getLocationMessage())
+        .toBe("unavailable");
+    },
+  );
+});
+
+// Scenario: http://uitestingplayground.com/clearinput
+// Each input below is pre-filled with text.
+// Clear the text in each input field using your automation tool.
+// Verify that all fields are empty after clearing.
+// The status label below the playground shows the number of non-empty fields remaining.
+
+test(
+  "Clear Input",
+  { tag: ["@smoke", "@e2e"] },
+  async ({ page, clearInputPage }) => {
+    await clearInputPage.goto();
+    await expect(page).toHaveURL("/clearinput");
+
+    await clearInputPage.clearInputText();
+    await clearInputPage.clearTextArea();
+    await clearInputPage.clearInputPassword();
+    await clearInputPage.clearInputEmail();
+    await clearInputPage.clearInputNumber();
+    await clearInputPage.clearInputSearch();
+    await clearInputPage.clearInputUrl();
+    await clearInputPage.clearInputTel();
+    await clearInputPage.clearInputEditableDiv();
+
+    const message = await clearInputPage.getNonEmptyFieldsRemainingText();
+    expect(message).toBe("All fields are cleared!");
   },
 );

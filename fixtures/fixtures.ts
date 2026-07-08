@@ -21,7 +21,10 @@ import { AlertsPage } from "@pages/AlertsPage";
 import { FileUploadPage } from "@pages/FileUploadPage";
 import { AnimatedButtonPage } from "@pages/AnimatedButtonPage";
 import { DisabledInputPage } from "@pages/DisabledInputPage";
-import { AutoWaitPage } from "@pages/AutoWaitPagePage";
+import { AutoWaitPage } from "@pages/AutoWaitPage";
+import { FramesPage } from "@pages/FramesPage";
+import { GeolocationPage } from "@pages/GeolocationPage";
+import { ClearInputPage } from "@pages/ClearInputPage";
 
 // Pattern for blocking ad domains in smoke runs (where real-site ads can
 // inject markup that breaks locators). Expand AD_DOMAIN_PATTERN to match
@@ -55,6 +58,9 @@ type Fixtures = {
   animatedButtonPage: AnimatedButtonPage;
   disabledInputPage: DisabledInputPage;
   autoWaitPage: AutoWaitPage;
+  framesPage: FramesPage;
+  geolocationPage: GeolocationPage;
+  clearInputPage: ClearInputPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -95,6 +101,9 @@ export const test = base.extend<Fixtures>({
     use(new AnimatedButtonPage(page)),
   disabledInputPage: async ({ page }, use) => use(new DisabledInputPage(page)),
   autoWaitPage: async ({ page }, use) => use(new AutoWaitPage(page)),
+  framesPage: async ({ page }, use) => use(new FramesPage(page)),
+  geolocationPage: async ({ page }, use) => use(new GeolocationPage(page)),
+  clearInputPage: async ({ page }, use) => use(new ClearInputPage(page)),
 });
 
 export { expect };
