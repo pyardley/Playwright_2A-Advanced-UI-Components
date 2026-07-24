@@ -11,12 +11,14 @@ export class GeolocationPage extends BasePage {
     this.path = "https://uitestingplayground.com/geolocation";
   }
 
+  // <button class="btn btn-primary" id="requestLocation" type="button">Request Location</button>
   async clickRequestLocationButton() {
     await this.page
       .getByRole("button", { name: "Request Location" })
       .click();
   }
 
+  // <span id="location">Not requested</span>
   async getLocationMessage() {
     return (await this.page.locator("#location").innerText()).trim();
   }

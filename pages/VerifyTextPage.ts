@@ -8,6 +8,9 @@ export class VerifyTextPage extends BasePage {
     this.path = "/verifytext";
   }
 
+  // <div class="bg-primary">
+  //   <span class="badge-secondary">Welcome <span>UserName</span>!</span>
+  // </div>
   async getWelcomeText() {
     const container = this.page.locator(".bg-primary");
     const text = container.getByText("Welcome");

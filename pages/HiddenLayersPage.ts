@@ -8,6 +8,7 @@ export class HiddenLayersPage extends BasePage {
     this.path = "/hiddenlayers";
   }
 
+  // <button class="btn btn-success" type="button" id="greenButton">Button</button>
   async clickOnGreenButton() {
     try {
       await this.page.locator("#greenButton").click({ timeout: 2000 });

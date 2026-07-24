@@ -8,6 +8,7 @@ export class ClientSideDelayPage extends BasePage {
     this.path = "/clientdelay";
   }
 
+  // <button class="btn btn-primary" type="button" id="ajaxButton" onclick="CreateLabel()">Button Triggering Client Side Logic</button>
   async clickOnClientSideDelayButton() {
     await await this.page
       .getByRole("button", {
@@ -17,6 +18,8 @@ export class ClientSideDelayPage extends BasePage {
       .click();
   }
 
+  // <p class="bg-success">Data calculated on the client side.</p>
+  // (appended to #content by CreateLabel() after a 15s setTimeout)
   async getClientSideDelayContent() {
     const contentLocator = this.page.getByText(
       "Data calculated on the client side.",

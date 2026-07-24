@@ -8,6 +8,7 @@ export class PhysicalClickPage extends BasePage {
     this.path = "/click";
   }
 
+  // <button class="btn btn-primary" id="badButton" type="button">Button That Ignores DOM Click Event</button>
   async clickPysicalButton() {
     const button = this.page.getByRole("button", {
       name: "Button That Ignores DOM Click Event",

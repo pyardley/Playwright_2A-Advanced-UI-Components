@@ -8,6 +8,7 @@ export class LoadDelayPage extends BasePage {
     this.path = "/loaddelay";
   }
 
+  // <button class="btn btn-primary" type="button">Button Appearing After Delay</button>
   async clickOnDelayButton() {
     await await this.page
       .getByRole("button", {

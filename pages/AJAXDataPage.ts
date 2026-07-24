@@ -8,6 +8,7 @@ export class AjaxDataPage extends BasePage {
     this.path = "/ajax";
   }
 
+  // <button class="btn btn-primary" type="button" id="ajaxButton" onclick="LoadLabel()">Button Triggering AJAX Request</button>
   async clickOnAjaxButton() {
     await await this.page
       .getByRole("button", {
@@ -17,6 +18,7 @@ export class AjaxDataPage extends BasePage {
       .click();
   }
 
+  // <button class="btn btn-primary" type="button" id="ajaxButton" onclick="LoadLabel()">Button Triggering AJAX Request</button>
   async getAjaxContent() {
     const contentLocator = this.page.getByRole("button", {
       name: "Button Triggering AJAX Request",

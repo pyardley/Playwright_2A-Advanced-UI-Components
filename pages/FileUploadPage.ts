@@ -10,10 +10,14 @@ export class FileUploadPage extends BasePage {
     this.path = "/upload";
   }
 
+  // <iframe src="/static/upload.html" width="800" height="500" frameborder="0"></iframe>
   private getUploadFrame() {
     return this.page.frameLocator("iframe");
   }
 
+  // <iframe src="/static/upload.html">
+  //   #document
+  //     <label for="browse" class="browse-btn">Browse files</label>
   async uploadViaBrowseButton(filePath: string) {
     const [fileChooser] = await Promise.all([
       this.page.waitForEvent("filechooser"),
@@ -22,6 +26,9 @@ export class FileUploadPage extends BasePage {
     await fileChooser.setFiles(filePath);
   }
 
+  // <iframe src="/static/upload.html">
+  //   #document
+  //     <div class="document-uploader upload-box">...</div>
   async uploadViaDragAndDrop(filePath: string) {
     // Real OS-level drag-and-drop can't be simulated by Playwright, so this
     // builds an in-page DataTransfer carrying the file's actual bytes and
@@ -60,10 +67,16 @@ export class FileUploadPage extends BasePage {
       .dispatchEvent("drop", { dataTransfer });
   }
 
+  // <iframe src="/static/upload.html">
+  //   #document
+  //     <p>sample-upload.txt</p>
   getUploadedFileNameText(fileName: string) {
     return this.getUploadFrame().getByText(fileName, { exact: true });
   }
 
+  // <iframe src="/static/upload.html">
+  //   #document
+  //     <p>1 file(s) selected</p>
   getSelectedFilesMessage() {
     return this.getUploadFrame().getByText("1 file(s) selected", {
       exact: true,

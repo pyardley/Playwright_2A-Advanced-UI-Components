@@ -8,10 +8,12 @@ export class TextInputPage extends BasePage {
     this.path = "/textinput";
   }
 
+  // <input class="form-control" type="text" placeholder="MyButton" id="newButtonName">
   async fillTextInputField(text: string) {
     await this.page.locator("#newButtonName").fill(text);
   }
 
+  // <button class="btn btn-primary" type="button" id="updatingButton">Button That Should Change it's Name Based on Input Value</button>
   async clickPysicalButton() {
     const button = this.page.locator("#updatingButton");
     await button.click();

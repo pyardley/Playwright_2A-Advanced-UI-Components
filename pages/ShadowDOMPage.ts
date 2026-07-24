@@ -13,10 +13,16 @@ export class ShadowDOMPage extends BasePage {
     this.path = "https://uitestingplayground.com/shadowdom";
   }
 
+  // <guid-generator>
+  //   #shadow-root
+  //     <button class="button-generate" id="buttonGenerate"><i class="fa fa-cog"></i></button>
   async clickGenerateGUID() {
     await this.page.locator("#buttonGenerate").click();
   }
 
+  // <guid-generator>
+  //   #shadow-root
+  //     <button class="button-copy" id="buttonCopy"><i class="fa fa-clone"></i></button>
   async clickCopyGUID(context: BrowserContext) {
     // The site's own click handler writes to the clipboard, so
     // clipboard-write must be granted before the click, not after.
@@ -30,6 +36,9 @@ export class ShadowDOMPage extends BasePage {
     ).trim();
   }
 
+  // <guid-generator>
+  //   #shadow-root
+  //     <input class="edit-field" id="editField">
   async getGeneratedGUID() {
     return (await this.page.locator("#editField").inputValue()).trim();
   }

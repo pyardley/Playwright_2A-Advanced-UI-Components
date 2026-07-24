@@ -8,6 +8,10 @@ export class DynamicTablePage extends BasePage {
     this.path = "/dynamictable";
   }
 
+  // <div role="table" aria-label="Tasks" aria-describedby="table_desc">
+  //   <div role="rowgroup">
+  //     <div role="row"><span role="columnheader">Name</span>...<span role="columnheader">CPU</span>...</div>
+  //     <div role="row"><span role="cell">Chrome</span>...<span role="cell">6.1%</span>...</div>
   async getChromeCPUValue() {
     // 1. Find all column headers and look for the one named "CPU"
     const headers = this.page.getByRole("columnheader");
@@ -30,6 +34,7 @@ export class DynamicTablePage extends BasePage {
     return await cpuCell.textContent();
   }
 
+  // <p class="bg-warning">Chrome CPU: 6.1%</p>
   async getExpectedValueForChromeCPU() {
     const cpuText = await (
       await this.page.locator("p.bg-warning").innerText()

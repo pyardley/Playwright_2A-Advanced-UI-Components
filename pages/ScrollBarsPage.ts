@@ -8,6 +8,7 @@ export class ScrollBarsPage extends BasePage {
     this.path = "/scrollbars";
   }
 
+  // <button class="btn btn-primary" type="button" id="hidingButton">Hiding Button</button>
   async clickButton() {
     await this.page
       .getByRole("button", { name: "Hiding Button", exact: true })

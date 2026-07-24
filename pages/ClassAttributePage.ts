@@ -8,6 +8,7 @@ export class ClassAttributePage extends BasePage {
     this.path = "/classattr";
   }
 
+  // <button class="btn class1 btn-primary btn-test" type="button">Button</button>
   async clickOnBlueButton() {
     await this.page.locator("button.btn-primary").click();
   }

@@ -8,14 +8,17 @@ export class ProgressBarPage extends BasePage {
     this.path = "/progressbar";
   }
 
+  // <button class="btn btn-primary btn-test" type="button" id="startButton" onclick="Start()">Start</button>
   async clickStartButton() {
     await this.page.getByRole("button", { name: "Start", exact: true }).click();
   }
 
+  // <button class="btn btn-info btn-test" type="button" id="stopButton" onclick="Stop()">Stop</button>
   async clickStopButton() {
     await this.page.getByRole("button", { name: "Stop", exact: true }).click();
   }
 
+  // <div class="progress-bar bg-info" id="progressBar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
   async getProgressBarValue() {
     const progressBar = this.page.locator("#progressBar");
     await progressBar.waitFor({ state: "visible", timeout: 15000 });
@@ -25,6 +28,9 @@ export class ProgressBarPage extends BasePage {
     return rawValue ? Number(rawValue) : 0;
   }
 
+  // <button id="startButton" onclick="Start()">Start</button>
+  // <button id="stopButton" onclick="Stop()">Stop</button>
+  // <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
   async waitForProgressBarToReachValue(targetValue: number) {
     // The progress bar increments in variable-sized steps on its own timer
     // and can skip straight past the target value, so this can't wait for

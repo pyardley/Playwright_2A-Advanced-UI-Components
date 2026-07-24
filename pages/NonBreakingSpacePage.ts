@@ -8,6 +8,7 @@ export class NonBreakingSpacePage extends BasePage {
     this.path = "/nbsp";
   }
 
+  // <button class="btn btn-primary" type="button">My&nbsp;Button</button>
   async clickOnButton() {
     await this.page.getByRole("button", { name: "My Button" }).click();
   }
